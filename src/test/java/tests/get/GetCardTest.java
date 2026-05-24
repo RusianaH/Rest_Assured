@@ -24,7 +24,7 @@ public class GetCardTest extends BaseTest {
                 .get(CardsEndpoints.GET_CARD_URL)
                 .then()
                 .statusCode(200)
-                .body("name", Matchers.equalTo("one"));
+                .body("name", Matchers.equalTo("jkt-bandung"));
 
 
     }

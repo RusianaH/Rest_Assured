@@ -3,6 +3,7 @@ package tests.get;
 import arguments.Holders.AuthValidationArgumentsHolder;
 import arguments.Holders.CardValidationArgumensHolder;
 import arguments.providers.AuthValidationArgumentsProvider;
+import arguments.providers.CardAuthValidationArgumentProvider;
 import arguments.providers.CardIdValidationArgumentsProvider;
 import consts.CardsEndpoints;
 import consts.UrlParamValues;
@@ -17,62 +18,47 @@ public class GetCardValidationTest extends BaseTest {
 
     @ParameterizedTest
     @ArgumentsSource(CardIdValidationArgumentsProvider.class)
-    public void checkGetCardWithValidId(CardValidationArgumensHolder validationArgumens) {
-
+    public void checkGetCardWithInvalidId(CardValidationArgumensHolder validationArguments) {
         Response response = requestWithAuth()
-                .pathParams(validationArgumens.getPathParams())
-                .get(CardsEndpoints.GET_CARD_URL);
-
-        response.then()
-                .statusCode(200);
-
-        String msg = response.body().asString().toLowerCase();
-
-        Assertions.assertTrue(
-                msg.contains(validationArgumens.getErrorMessage()),
-                "Expected: " + validationArgumens.getErrorMessage() + " but got: " + msg
-        );
-
-    }
-
-
-    @ParameterizedTest
-    @ArgumentsSource(AuthValidationArgumentsProvider.class)
-    public void checkGetCardWithInvalidAuth(AuthValidationArgumentsHolder validationArguments) {
-        Response response = requestWithoutAuth()
-                .queryParams((validationArguments.getAuthParams()))
-                .pathParam("id", UrlParamValues.EXISTING_CARD_ID)
+                .pathParams(validationArguments.getPathParams())
                 .get(CardsEndpoints.GET_CARD_URL);
         response
                 .then()
+                .statusCode(validationArguments.getStatusCode());
+        Assertions.assertEquals(validationArguments.getErrorMessage(), response.body().asString());
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(CardAuthValidationArgumentProvider.class)
+    public void checkGetCardWithInvalidAuth(AuthValidationArgumentsHolder validationArguments) {
+        Response response = requestWithoutAuth()
+                .queryParams(validationArguments.getAuthParams())
+                .pathParam("id", UrlParamValues.EXISTING_CARD_ID)
+                .get(CardsEndpoints.GET_CARD_URL);
+
+        System.out.println("AUTH = " + validationArguments.getAuthParams());
+        System.out.println("EXPECTED = " + validationArguments.getErrorMessage());
+        System.out.println("ACTUAL = " + response.body().asString());
+        System.out.println("--------------------------------");
+
+        response
+                .then().log().all()
                 .statusCode(401);
-
-        String msg = response.body().asString().toLowerCase();
-
-        Assertions.assertTrue(
-                msg.contains(validationArguments.getErrorMessage()),
-                "Expected: " + validationArguments.getErrorMessage() + " but got: " + msg
+        Assertions.assertEquals(
+                validationArguments.getErrorMessage(),
+                response.body().asString()
         );
     }
-    //get api another credentials
-    //these cred do not have access to the board
+
     @Test
-    public void checkGetCardWithAnotherUserCredentials(){
+    public void checkGetCardWithAnotherUserCredentials() {
         Response response = requestWithoutAuth()
                 .queryParams(UrlParamValues.ANOTHER_USER_AUTH_QUERY_PARAMS)
                 .pathParam("id", UrlParamValues.EXISTING_CARD_ID)
                 .get(CardsEndpoints.GET_CARD_URL);
         response
-
                 .then()
                 .statusCode(401);
-
-        String body = response.body().asString().toLowerCase();
-
-        Assertions.assertTrue(
-                body.contains("missing scopes"),
-                "Expected missing scopes but got: " + body
-        );
-    }}
-
-
+        Assertions.assertEquals("unauthorized card permission requested", response.body().asString());
+    }
+}

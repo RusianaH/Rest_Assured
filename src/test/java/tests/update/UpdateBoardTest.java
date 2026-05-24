@@ -15,14 +15,18 @@ public class UpdateBoardTest extends BaseTest {
     @Test
     public void checkUpdateBoard()
     {
-        String updateName = "Updated Name" + LocalDateTime.now();
+        String updateName = "Updated Name" + LocalDateTime.now()
+         .toString().replace(":", "").replace(".", "").replace("-", "").replace("T", "");
+
         requestWithAuth()
                 .pathParam("id", UrlParamValues.BOARD_ID_TO_UPDATE)
                 .body(Map.of("name", updateName))
                 .contentType(ContentType.JSON)
                 .put(BoardEndpoints.UPDATE_BOARD_URL)
                 .then()
+                .statusCode(200)
                 .body("name", Matchers.equalTo(updateName));
+
         requestWithAuth()
                 .pathParam("id", UrlParamValues.BOARD_ID_TO_UPDATE)
                 .get(BoardEndpoints.GET_BOARD_URL)

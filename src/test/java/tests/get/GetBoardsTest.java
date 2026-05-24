@@ -16,7 +16,7 @@ public class GetBoardsTest extends BaseTest {
                 .queryParams("fields", "id,name")
                 .pathParam("member", UrlParamValues.USER_NAME)
                 .get(BoardEndpoints.GET_ALL_BOARDS_URL)
-                .then()
+                .then().log().all()
                 .statusCode(200)
                 .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemas/get_boards.json"));
 
@@ -31,6 +31,6 @@ public class GetBoardsTest extends BaseTest {
                 .log().all()
                 .statusCode(200)
                 .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemas/get_board.json"))
-                .body("name", Matchers.equalTo("io"));
+                .body("name", Matchers.equalTo("itenerary"));
     }
 }

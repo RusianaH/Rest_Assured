@@ -32,9 +32,10 @@ public class DeleteBoardTest extends BaseTest {
                         .body("_value", Matchers.equalTo(null));
 
         requestWithAuth()
-//                .pathParam("member", UrlParamValues.USER_NAME)
+                .pathParam("member", UrlParamValues.USER_NAME)
                 .get(BoardEndpoints.GET_ALL_BOARDS_URL)
                 .then()
+                .statusCode(200)
                 .body("id", Matchers.not(Matchers.hasItem(createdBoardId)));
     }
 }

@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 public class BoardNameValidationArgumentsProvider implements ArgumentsProvider {
 
     @Override
-    public Stream provideArguments(ExtensionContext Context){
+    public Stream<Arguments> provideArguments(ExtensionContext Context){
         return Stream.of(
                 Map.of("name", 12345),
                 Collections.emptyMap()

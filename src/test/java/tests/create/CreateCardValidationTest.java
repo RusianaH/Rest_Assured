@@ -30,9 +30,10 @@ public class CreateCardValidationTest extends BaseTest {
         response
                 .then()
                 .statusCode(400);
-//        Assertions.assertEquals(validationArguments.getErrorMessage(), response.jsonPath().getString("message"));
+
         String message = ErrorMessageExtractor.getMessage(response);
         Assertions.assertEquals(validationArguments.getErrorMessage(), message);
+
     }
 
     @ParameterizedTest
@@ -46,12 +47,16 @@ public class CreateCardValidationTest extends BaseTest {
                 ))
                 .contentType(ContentType.JSON)
                 .post(CardsEndpoints.CREATE_CARD_URL);
+
+        System.out.println(validationArguments.getAuthParams());
+        System.out.println("STATUS = " + response.statusCode());
+
+        response.prettyPrint();
         response
                 .then()
                 .statusCode(401);
-//        Assertions.assertEquals(validationArguments.getErrorMessage(), response.jsonPath().getString("message"));
-        String message = ErrorMessageExtractor.getMessage(response);
-        Assertions.assertEquals(validationArguments.getErrorMessage(), message);
+        Assertions.assertEquals(validationArguments.getErrorMessage(), response.body().asString());
+
     }
 
     @Test
@@ -67,7 +72,8 @@ public class CreateCardValidationTest extends BaseTest {
         response
                 .then()
                 .statusCode(401);
-        Assertions.assertEquals("unauthorized card permission requested", response.body().asString());
+
+         Assertions.assertEquals("unauthorized card permission requested", response.body().asString());
     }
 
 }

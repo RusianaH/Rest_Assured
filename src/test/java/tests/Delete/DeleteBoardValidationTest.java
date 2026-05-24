@@ -33,7 +33,7 @@ public class DeleteBoardValidationTest extends BaseTest {
         Response response = requestWithoutAuth()
                 .queryParams(validationArguments.getAuthParams())
                 .pathParam("id", UrlParamValues.EXISTING_BOARD_ID)
-                .delete(CardsEndpoints.DELETE_CARD_URL);
+                .delete(BoardEndpoints.DELETE_BOARD_URL);
         response
                 .then().log().all()
                 .statusCode(401);

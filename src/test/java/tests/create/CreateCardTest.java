@@ -26,6 +26,9 @@ public class CreateCardTest extends BaseTest {
                 ))
                 .contentType(ContentType.JSON)
                 .post(CardsEndpoints.CREATE_CARD_URL);
+
+        System.out.println(response.asPrettyString());
+
         createdCardId = response.body().jsonPath().get("id");
         response
                 .then()

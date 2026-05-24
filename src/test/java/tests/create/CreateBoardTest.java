@@ -18,19 +18,25 @@ public class CreateBoardTest extends BaseTest {
 
     @Test
     public void checkCreateBoard() {
-        String boardName = "New Board" + LocalDateTime.now();
+        String boardName = "New Board" + LocalDateTime.now()
+        .toString()
+                .replace(":", "")
+                .replace(".", "")
+                .replace("-", "")
+                .replace("T", "");
+
         Response response = requestWithAuth()
                 .body(Map.of("name", boardName))
                 .contentType(ContentType.JSON)
                 .post(BoardEndpoints.CREATE_BOARD_URL);
-        createdBoardId = response.body().jsonPath().get("id");
         response
                 .then()
-                .log().all()
                 .statusCode(200)
                 .body("name", Matchers.equalTo(boardName));
+        createdBoardId = response.body().jsonPath().get("id");
+
         requestWithAuth()
-                .log().all()
+                .pathParam("member", UrlParamValues.USER_NAME)
                 .get(BoardEndpoints.GET_ALL_BOARDS_URL)
                 .then()
                 .statusCode(200)
@@ -40,6 +46,7 @@ public class CreateBoardTest extends BaseTest {
 
     @AfterEach
     public void deleteCreatedBoard(){
+        if (createdBoardId != null) {
             requestWithAuth()
                     .pathParam("id", createdBoardId)
                     .delete(BoardEndpoints.DELETE_BOARD_URL)
@@ -47,5 +54,5 @@ public class CreateBoardTest extends BaseTest {
                     .statusCode(200);
         }
 
-    }
+    }}
 

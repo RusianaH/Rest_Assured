@@ -2,6 +2,7 @@ package tests.get;
 
 import arguments.Holders.AuthValidationArgumentsHolder;
 import arguments.providers.AuthValidationArgumentsProvider;
+import arguments.providers.BoardAuthValidationArgumentsProvider;
 import arguments.providers.BoardIdValidationArgumentsProvider;
 import arguments.Holders.BoardIdValidationArgumentsHolder;
 import consts.BoardEndpoints;
@@ -18,44 +19,30 @@ public class GetBoardsValidationTest extends BaseTest {
 
     @ParameterizedTest
     @ArgumentsSource(BoardIdValidationArgumentsProvider.class)
-    public void checkGetBoardWithValidId(BoardIdValidationArgumentsHolder validationArguments) {
+    public void checkGetBoardWithInvalidId(BoardIdValidationArgumentsHolder validationArguments) {
         Response response = requestWithAuth()
                 .pathParams(validationArguments.getPathParams())
                 .get(BoardEndpoints.GET_BOARD_URL);
         response
                 .then()
                 .statusCode(validationArguments.getStatusCode());
-
-        String actualMessage = ErrorMessageExtractor.extract(response);
-
-        System.out.println("=== DEBUG INVALID ID ===");
-        System.out.println("Raw body   : " + response.getBody().asString());
-        System.out.println("Actual msg : " + actualMessage);
-        System.out.println("Expected   : " + validationArguments.getErrorMessage());
-        Assertions.assertEquals(
-                validationArguments.getErrorMessage(),
-                actualMessage,
-                "Expected different error message"
-        );
+        Assertions.assertEquals(validationArguments.getErrorMessage(), response.body().asString());
     }
 
     @ParameterizedTest
-    @ArgumentsSource(AuthValidationArgumentsProvider.class)
+    @ArgumentsSource(BoardAuthValidationArgumentsProvider.class)
     public void checkGetBoardWithInvalidAuth(AuthValidationArgumentsHolder validationArguments) {
         Response response = requestWithoutAuth()
                 .queryParams(validationArguments.getAuthParams())
-                .pathParams("id", UrlParamValues.EXISTING_BOARD_ID)
+                .pathParam("id", UrlParamValues.EXISTING_BOARD_ID)
                 .get(BoardEndpoints.GET_BOARD_URL);
         response
                 .then()
                 .statusCode(401);
-        String msg = ErrorMessageExtractor.extract(response).toLowerCase();
-
-        Assertions.assertTrue(
-                msg.contains(validationArguments.getErrorMessage()) || msg.contains("unauthorized"),
-                "Expected: " + validationArguments.getErrorMessage() + "but got: " +msg);
-
-
+        Assertions.assertEquals(
+                validationArguments.getErrorMessage(),
+                response.body().asString());
+//        Assertions.assertEquals("missing scope", response.body().asString());
     }
 
     @Test
@@ -67,15 +54,6 @@ public class GetBoardsValidationTest extends BaseTest {
         response
                 .then()
                 .statusCode(401);
-        String msg = ErrorMessageExtractor.extract(response).toLowerCase();
-
-        System.out.println("=== DEBUG INVALID AUTH ===");
-        System.out.println("Raw body : " + response.getBody().asString());
-        System.out.println("Actual msg: " + msg);
-
-        Assertions.assertTrue(
-                msg.contains("invalid") || msg.contains("unauthorized"),
-                "Expected invalid auth message, but got: " + msg
-        );
+        Assertions.assertEquals("unauthorized permission requested", response.body().asString());
     }
 }
