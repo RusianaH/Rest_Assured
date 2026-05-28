@@ -69,3 +69,7 @@ src/test/java/
 - Test data management with ArgumentsProvider
 - Positive and negative test scenarios
 - Authentication validation testing
+
+## Test Report
+![Test Report](<img width="1906" height="753" alt="image" src="https://github.com/user-attachments/assets/026f079d-aa4d-4fc7-995f-2c68f3562e61" />
+)
